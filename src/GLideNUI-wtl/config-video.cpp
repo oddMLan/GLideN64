@@ -181,20 +181,20 @@ void CVideoTab::ShowOverScanTab(int nTab)
 
 void CVideoTab::LoadSettings(bool /*blockCustomSettings*/)
 {
-    CComboBox WindowedResolutionComboBox(GetDlgItem(IDC_CMB_WINDOWED_RESOLUTION));
+    m_WindowedResolutionComboBox.SubclassWindow(GetDlgItem(IDC_CMB_WINDOWED_RESOLUTION));
     for (unsigned int i = 0; i < numWindowedModes; ++i)
     {
-        int index = WindowedResolutionComboBox.AddString(WindowedModes[i].description);
-        WindowedResolutionComboBox.SetItemData(index, i);
+        int index = m_WindowedResolutionComboBox.AddString(WindowedModes[i].description);
+        m_WindowedResolutionComboBox.SetItemData(index, i);
         if (WindowedModes[i].width == config.video.windowedWidth &&
             WindowedModes[i].height == config.video.windowedHeight)
         {
-            WindowedResolutionComboBox.SetCurSel(index);
+            m_WindowedResolutionComboBox.SetCurSel(index);
         }
     }
-    if (WindowedResolutionComboBox.GetCount() > 0 && WindowedResolutionComboBox.GetCurSel() < 0)
+    if (m_WindowedResolutionComboBox.GetCount() > 0 && m_WindowedResolutionComboBox.GetCurSel() < 0)
     {
-        WindowedResolutionComboBox.SetCurSel(0);
+        m_WindowedResolutionComboBox.SetCurSel(0);
     }
 
     CButton overscanCheckBox(GetDlgItem(IDC_CHK_OVERSCAN));

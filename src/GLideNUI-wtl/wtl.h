@@ -10,9 +10,9 @@
 #pragma warning(disable : 4996) // warning C4996: 'GetVersionExA': was declared deprecated
 #define _ATL_DISABLE_NOTHROW_NEW
 #include <atlbase.h>
-#include "wtl\atlapp.h"
-#include "wtl\atlcrack.h"
-#include "wtl\atlctrls.h"
+#include "WTL\atlapp.h"
+#include "WTL\atlcrack.h"
+#include "WTL\atlctrls.h"
 #include "WTL\atlctrlx.h"
 #include "WTL\atlgdi.h"
 #include "WTL\atlmisc.h"

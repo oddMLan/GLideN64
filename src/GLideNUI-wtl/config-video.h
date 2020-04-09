@@ -1,6 +1,9 @@
+#define _WTL_NO_CSTRING
+
 #pragma once
 #include "config-tab.h"
 #include "config-overscan.h"
+#include "wtl-AutoComplete.h"
 #include "wtl-BitmapPicture.h"
 #include "resource.h"
 #include <vector>
@@ -36,9 +39,16 @@ public:
     void LoadSettings(bool blockCustomSettings);
     void SaveSettings();
 
+    CAutoCombo m_WindowedResolutionComboBox;
     CTabCtrl m_OverScanTab;
     std::vector<COverScanTab *> m_OverscanTabs;
     CTrackBarCtrl m_AliasingSlider;
     CTrackBarCtrl m_AnisotropicSlider;
     CBitmapPicture m_AAInfoIcon;
+
+    BOOL PreTranslateMessage(MSG* pMsg)
+    {
+        m_WindowedResolutionComboBox.PreTranslateMessage(pMsg);
+        return IsDialogMessage(pMsg);
+    }
 };
