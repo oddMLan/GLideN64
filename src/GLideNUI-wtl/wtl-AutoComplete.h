@@ -4,7 +4,7 @@
 #include "WTL\atlcrack.h"
 #include <atlstr.h>
 
-class CAutoCombo : public CWindowImpl<CAutoCombo, CComboBox>, public CMessageFilter
+class CAutoCombo : public CWindowImpl<CAutoCombo, CComboBox>
 {
 protected:
     bool	m_bAutoComplete;
@@ -12,9 +12,10 @@ public:
 
     CAutoCombo()
     {
-        m_bAutoComplete = true;
+        m_bAutoComplete = TRUE;
     }
     BEGIN_MSG_MAP(CAutoCombo)
+        //MESSAGE_HANDLER(WM_CHAR, OnKeyDown)
         REFLECTED_COMMAND_CODE_HANDLER_EX(CBN_EDITUPDATE, OnEditUpdate)
         DEFAULT_REFLECTION_HANDLER()
     END_MSG_MAP()
@@ -31,8 +32,12 @@ public:
 
     LRESULT OnEditUpdate(UINT, int, HWND)
     {
-        if (!m_bAutoComplete)
-            return 0;
+        MessageBox(L"OnEditUpdate");
+        // if we are not to auto update the text, get outta here
+        if (!m_bAutoComplete) {
+            MessageBox(L"cancellation succesfull");
+            return S_OK;
+        }
 
         // Get the text in the edit box
         ATL::CString str;
@@ -58,22 +63,24 @@ public:
             SetEditSel(dStart, dEnd);
         else
             SetEditSel(nLength, -1);
-        return 0;
+        return S_OK;
     }
 
-    BOOL PreTranslateMessage(MSG* pMsg)
+    LRESULT OnKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled)
     {
         // Need to check for backspace/delete. These will modify the text in
         // the edit box, causing the auto complete to just add back the text
-        // the user has just tried to delete. 
-        if (pMsg->message == WM_KEYDOWN)
+        // the user has just tried to delete.
+        if (wParam == VK_DELETE || wParam == VK_BACK)
         {
-            m_bAutoComplete = true;
-
-            int nVirtKey = (int)pMsg->wParam;
-            if (nVirtKey == VK_DELETE || nVirtKey == VK_BACK)
-                m_bAutoComplete = false;
+            MessageBox(L"inside if");
+            m_bAutoComplete = FALSE;
+            bHandled = TRUE;
+            return S_OK;
         }
-        return FALSE;
+        MessageBox(L"outside if");
+        m_bAutoComplete = TRUE;
+        bHandled = FALSE;
+        return S_OK;
     }
 };

@@ -12,6 +12,8 @@ class CVideoTab :
     public CConfigTab
 {
 public:
+    CContainedWindow m_Edit;
+
     BEGIN_MSG_MAP(CVideoTab)
         MSG_WM_INITDIALOG(OnInitDialog)
         MESSAGE_HANDLER(WM_CTLCOLORDLG, OnColorStatic)
@@ -23,6 +25,9 @@ public:
         MESSAGE_HANDLER(WM_HSCROLL, OnScroll)
         MESSAGE_HANDLER(WM_VSCROLL, OnScroll)
         REFLECT_NOTIFICATIONS()
+        ALT_MSG_MAP(1)
+            //MESSAGE_HANDLER(WM_GETDLGCODE, OnGetDlgCode)
+            MESSAGE_HANDLER(WM_KEYDOWN, OnKeyDown)
     END_MSG_MAP()
 
     CVideoTab();
@@ -33,6 +38,8 @@ public:
     void OnOverscan(UINT /*Code*/, int id, HWND /*ctl*/);
     LRESULT OnColorStatic(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
     LRESULT OnOverscanTabChange(NMHDR* /*pNMHDR*/);
+    LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT OnGetDlgCode(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
     void OnFullScreenChanged(UINT /*Code*/, int id, HWND /*ctl*/);
     void AddOverScanTab(const wchar_t * caption);
     void ShowOverScanTab(int nTab);
@@ -45,10 +52,4 @@ public:
     CTrackBarCtrl m_AliasingSlider;
     CTrackBarCtrl m_AnisotropicSlider;
     CBitmapPicture m_AAInfoIcon;
-
-    BOOL PreTranslateMessage(MSG* pMsg)
-    {
-        m_WindowedResolutionComboBox.PreTranslateMessage(pMsg);
-        return IsDialogMessage(pMsg);
-    }
 };

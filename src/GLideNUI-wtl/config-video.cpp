@@ -26,8 +26,8 @@ WindowedModes[] =
 };
 static const unsigned int numWindowedModes = sizeof(WindowedModes) / sizeof(WindowedModes[0]);
 
-
-CVideoTab::CVideoTab() :
+CVideoTab::CVideoTab() : 
+    m_Edit(_T("EDIT"), this, 1),
     CConfigTab(IDD_TAB_VIDEO)
 {
 }
@@ -41,8 +41,24 @@ CVideoTab::~CVideoTab()
     m_OverscanTabs.clear();
 }
 
+LRESULT CVideoTab::OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    if (m_hWnd == NULL || m_WindowedResolutionComboBox == NULL)
+    {
+        return FALSE;
+    }
+    return m_WindowedResolutionComboBox.OnKeyDown(uMsg, wParam, lParam, bHandled);
+}
+
+LRESULT CVideoTab::OnGetDlgCode(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    return DLGC_WANTALLKEYS;
+}
+
 BOOL CVideoTab::OnInitDialog(CWindow /*wndFocus*/, LPARAM /*lInitParam*/)
 {
+    m_Edit.SubclassWindow(::GetWindow(GetDlgItem(IDC_CMB_WINDOWED_RESOLUTION), GW_CHILD));
+
     m_OverScanTab.Attach(GetDlgItem(IDC_TAB_OVERSCAN));
     AddOverScanTab(L"NTSC");
     AddOverScanTab(L"PAL");
@@ -349,3 +365,4 @@ void CVideoTab::SaveSettings()
     config.generalEmulation.enableDitheringQuantization = CButton(GetDlgItem(IDC_CHK_5BIT_QUANTIZATION)).GetCheck() == BST_CHECKED ? 1 : 0;
     config.generalEmulation.enableHiresNoiseDithering = CButton(GetDlgItem(IDC_CHK_HIRES_NOISE)).GetCheck() == BST_CHECKED ? 1 : 0;
 }
+
