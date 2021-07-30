@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{37CAB375-A7A6-3CAB-BD56-0E954D3FD2FE}</ProjectGuid>
     <RootNamespace>GLideNUI</RootNamespace>
-    <Keyword>Qt4VSv1.0</Keyword>
+    <Keyword>QtVS_v302</Keyword>
   </PropertyGroup>
   <PropertyGroup Condition="'$(WindowsTargetPlatformVersion)'=='' and '$(VisualStudioVersion)' != '12.0' and '$(VisualStudioVersion)' != '14.0'">
     <LatestTargetPlatformVersion>$([Microsoft.Build.Utilities.ToolLocationHelper]::GetLatestSDKTargetPlatformVersion('Windows', '10.0'))</LatestTargetPlatformVersion>
@@ -37,11 +37,27 @@
     <PrimaryOutput>GLideNUI</PrimaryOutput>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup Condition="'$(QtMsBuild)'=='' or !Exists('$(QtMsBuild)\qt.targets')">
+    <QtMsBuild>$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+  </PropertyGroup>
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
   <ImportGroup Label="ExtensionSettings" />
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Label="QtSettings">
+    <QtModules>core;gui;uitools;widgets;winextras</QtModules>
+    <QtInstall>qt-5.15.1-static-msvc2019-x86_64</QtInstall>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
   <PropertyGroup>
     <OutDir>$(SolutionDir)bin\$(Platform)\$(Configuration)\lib\</OutDir>
     <IntDir>$(SolutionDir)build\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
@@ -50,26 +66,15 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;QT_STATICPLUGIN;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CORE_LIB;QT_UITOOLS_LIB;QT_WINEXTRAS_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(QTDIR)\include;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtCore;release;.;$(QTDIR)\mkspecs\win32-msvc2013;.\GeneratedFiles;$(QTDIR)\include\QtUiTools;$(QTDIR)\include\QtWinExtras;$(ProjectDir)..\..\src\osal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;release;.\GeneratedFiles;$(ProjectDir)..\..\src\osal;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zm200 -w34100 -w34189 %(AdditionalOptions)</AdditionalOptions>
-      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
-      <BrowseInformation>false</BrowseInformation>
       <ExceptionHandling>Sync</ExceptionHandling>
-      <ObjectFileName>$(IntDir)</ObjectFileName>
-      <PreprocessorDefinitions>OS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PreprocessToFile>false</PreprocessToFile>
-      <ProgramDataBaseFileName>$(IntDir)vc$(VisualStudioVersion).pdb</ProgramDataBaseFileName>
-      <RuntimeTypeInfo>true</RuntimeTypeInfo>
-      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <PreprocessorDefinitions>QT_STATICPLUGIN;OS_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
       <WarningLevel>Level3</WarningLevel>
       <OutputFile>$(OutDir)\GLideNUI.lib</OutputFile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
-    <Lib>
-      <AdditionalLibraryDirectories>$(QTDIR)\lib;$(QTDIR)\plugins\platforms;$(QTDIR)\plugins\imageformats</AdditionalLibraryDirectories>
-      <AdditionalDependencies>imm32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Debug'">
     <ClCompile>
@@ -77,119 +82,60 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>qtpcred.lib;qtmaind.lib;qwindowsd.lib;qicod.lib;qtharfbuzzngd.lib;Qt5Cored.lib;Qt5Guid.lib;Qt5Widgetsd.lib;Qt5PlatformSupportd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
-    <Link>
-      <AdditionalDependencies>Qt5UiToolsd.lib;Qt5WinExtrasd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)'=='Release'">
     <ClCompile>
-      <PreprocessorDefinitions>QT_NO_DEBUG;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <Optimization>MaxSpeed</Optimization>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <WholeProgramOptimization>false</WholeProgramOptimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
-    <Lib>
-      <AdditionalDependencies>qtpcre.lib;qtmain.lib;qwindows.lib;qico.lib;qtharfbuzzng.lib;Qt5Core.lib;Qt5Gui.lib;Qt5Widgets.lib;Qt5PlatformSupport.lib;%(AdditionalDependencies)</AdditionalDependencies>
-    </Lib>
     <Link>
-      <AdditionalDependencies>Qt5UiTools.lib;Qt5WinExtras.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
     </Link>
     <Lib>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
+    <QtUic>
+      <QtUicDir>.\GeneratedFiles</QtUicDir>
+    </QtUic>
+    <QtRcc>
+      <QtRccDir>.\GeneratedFiles</QtRccDir>
+    </QtRcc>
+    <QtMoc>
+      <QtMocDir>$(ConfigurationName)</QtMocDir>
+    </QtMoc>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\src\GLideNUI\AboutDialog.cpp" />
-    <ClCompile Include="..\..\src\GLideNUI\ConfigDialog.cpp" />
-    <ClCompile Include="..\..\src\GLideNUI\QtKeyToHID.cpp" />
-    <ClCompile Include="..\..\SRC\GLideNUI\HIDKeyToName.cpp" />
-    <ClCompile Include="Debug\moc_AboutDialog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_ConfigDialog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Release'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GLideNUI\FullscreenResolutions_windows.cpp" />
-    <ClCompile Include="GeneratedFiles\qrc_icon.cpp">
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GLideNUI\GLideNUI.cpp" />
-    <ClCompile Include="Release\moc_AboutDialog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Release\moc_ConfigDialog.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)'=='Debug'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\src\GLideNUI\ScreenShot.cpp" />
-    <ClCompile Include="..\..\src\GLideNUI\Settings.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\src\GLideNUI\AboutDialog.h">
-      <Command>setlocal
-if errorlevel 1 goto VCEnd
-if errorlevel 1 goto VCEnd
-endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" -D_WINDOWS -DUNICODE -DWIN32 -DQT_STATICPLUGIN -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG -DQT_UITOOLS_LIB -DQT_WINEXTRAS_LIB  "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I." "-I$(QTDIR)\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I$(QTDIR)\include\QtUiTools" "-I$(QTDIR)\include\QtWinExtras"</Command>
-      <Message>Moc%27ing AboutDialog.h...</Message>
-      <Outputs>$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\GLideNUI\ConfigDialog.h">
-      <Command>setlocal
-if errorlevel 1 goto VCEnd
-if errorlevel 1 goto VCEnd
-endlocal
-"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" -D_WINDOWS -DUNICODE -DWIN32 -DQT_STATICPLUGIN -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DNDEBUG -DQT_UITOOLS_LIB -DQT_WINEXTRAS_LIB  "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I." "-I$(QTDIR)\mkspecs\win32-msvc2013" "-I.\GeneratedFiles" "-I$(QTDIR)\include\QtUiTools" "-I$(QTDIR)\include\QtWinExtras"</Command>
-      <Message>Moc%27ing ConfigDialog.h...</Message>
-      <Outputs>$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <AdditionalInputs>$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-    </CustomBuild>
-    <ClInclude Include="..\..\src\GLideNUI\FullscreenResolutions.h" />
-    <ClInclude Include="GeneratedFiles\ui_AboutDialog.h" />
-    <ClInclude Include="GeneratedFiles\ui_configDialog.h" />
-    <ClInclude Include="..\..\src\GLideNUI\GLideNUI.h" />
-    <ClInclude Include="..\..\src\GLideNUI\Settings.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="..\..\src\GLideNUI\AboutDialog.ui">
-      <FileType>Document</FileType>
-      <AdditionalInputs>$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command>"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
-      <Message>Uic%27ing %(Identity)...</Message>
-      <Outputs>.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
-    </CustomBuild>
-    <CustomBuild Include="..\..\src\GLideNUI\configDialog.ui">
-      <FileType>Document</FileType>
-      <AdditionalInputs>$(QTDIR)\bin\uic.exe;%(AdditionalInputs)</AdditionalInputs>
-      <Command>"$(QTDIR)\bin\uic.exe" -o ".\GeneratedFiles\ui_%(Filename).h" "%(FullPath)"</Command>
-      <Message>Uic%27ing %(Identity)...</Message>
-      <Outputs>.\GeneratedFiles\ui_%(Filename).h;%(Outputs)</Outputs>
-    </CustomBuild>
-  </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src\GLideNUI\Resources\Icon.ico">
       <ExcludedFromBuild>true</ExcludedFromBuild>
     </None>
-    <CustomBuild Include="..\..\src\GLideNUI\icon.qrc">
-      <FileType>Document</FileType>
-      <AdditionalInputs>%(FullPath);.\Icon.ico;%(AdditionalInputs)</AdditionalInputs>
-      <Command>"$(QTDIR)\bin\rcc.exe" -name "%(Filename)" -no-compress "%(FullPath)" -o .\GeneratedFiles\qrc_%(Filename).cpp</Command>
-      <Message>Rcc%27ing %(Identity)...</Message>
-      <Outputs>.\GeneratedFiles\qrc_%(Filename).cpp;%(Outputs)</Outputs>
-    </CustomBuild>
+    <QtRcc Include="..\..\src\GLideNUI\icon.qrc" />
+    <QtMoc Include="..\..\src\GLideNUI\AboutDialog.h" />
+    <QtMoc Include="..\..\src\GLideNUI\ConfigDialog.h" />
+    <QtUic Include="..\..\src\GLideNUI\AboutDialog.ui" />
+    <QtUic Include="..\..\src\GLideNUI\configDialog.ui" />
+    <ClInclude Include="..\..\src\GLideNUI\FullscreenResolutions.h" />
+    <ClInclude Include="..\..\src\GLideNUI\GLideNUI.h" />
+    <ClInclude Include="..\..\src\GLideNUI\Settings.h" />
+    <ClCompile Include="..\..\src\GLideNUI\AboutDialog.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\ConfigDialog.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\QtKeyToHID.cpp" />
+    <ClCompile Include="..\..\SRC\GLideNUI\HIDKeyToName.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\FullscreenResolutions_windows.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\GLideNUI.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\ScreenShot.cpp" />
+    <ClCompile Include="..\..\src\GLideNUI\Settings.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_Win32="$(DefaultQtVersion)" />
-    </VisualStudio>
-  </ProjectExtensions>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>
